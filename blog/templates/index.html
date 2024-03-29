@@ -1,0 +1,372 @@
+<!-- -*- coding: utf-8 -*- -->
+<!-- author : heart -->
+<!-- blog_url : https://www.cnblogs.com/ssrheart/ -->
+<!-- time : 2024/3/15 -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/sweetalert.min.js' %}"></script>
+    <link href="//unpkg.com/layui@2.9.7/dist/css/layui.css" rel="stylesheet">
+    <script src="//unpkg.com/layui@2.9.7/dist/layui.js"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'index' %}">博客园</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="{% url 'index' %}">首页<span class="sr-only">(current)</span></a></li>
+                <li><a href="http://127.0.0.1:8000/heart/">文章</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">更多<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="https://github.com/ssrheart425">github</a></li>
+                        <li><a href="https://gitee.com/heart99999">gitee</a></li>
+                        <li><a href="https://www.cnblogs.com/ssrheart">博客园</a></li>
+                        {#                        <li role="separator" class="divider"></li>#}
+                        {#                        <li><a href="#">Separated link</a></li>#}
+                    </ul>
+                </li>
+            </ul>
+            <form class="navbar-form navbar-left">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Search" id="search_key">
+                </div>
+                <button type="submit" class="btn btn-default" id='baidu_btn'>提交</button>
+            </form>
+            <form id="login_form">
+                {% csrf_token %}
+                <ul class="nav navbar-nav navbar-right">
+                    {% if request.user.is_authenticated %}
+                        <li>
+                            <p data-toggle="modal" data-target="#myModal1">
+                                <img src="/media/{{ request.user.avatar }}/" alt="" class="img-circle"
+                                     style="width: auto;height: 50px">
+                            </p>
+                        </li>
+                        <div class="modal fade modal_img" tabindex="-1" role="dialog" id='myModal1'>
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title text-center">修改头像</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        {% csrf_token %}
+                                        <div class="form-group text-center">
+                                            <label for="myfile1">头像
+                                                {% for avatar in avatar_obj %}
+                                                    <img src="/media/{{ avatar.avatar }}/" alt=""
+                                                         style="width: 80px;height: 80px;margin-left: 20px;border-radius: 50%;"
+                                                         id="myimg1"></label>
+                                                    <input type="file" id="myfile1" name="avatar" style="display: none">
+                                                {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                                        </button>
+                                        <button type="button" class="btn btn-primary" id="submit_avatar">提交</button>
+                                    </div>
+                                </div><!-- /.modal-content -->
+                            </div><!-- /.modal-dialog -->
+                        </div><!-- /.modal -->
+
+                        <li><a href="#">{{ request.user.username }}
+                            {% if request.user.is_superuser %}
+                                [管理员]
+                            {% else %}
+                                [普通用户]
+                            {% endif %}
+                        </a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true"
+                               aria-expanded="false">更多操作<span class="caret"></span></a>
+                            <ul class="dropdown-menu"> 
+                                <li><a href="#changePasswordModal" data-toggle="modal">修改密码</a></li>
+                                <li><a href="{% url 'adv' %}">添加广告</a></li>
+                                <li><a href="{% url 'backend' %}">后台管理</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a id="ajax-link" href="#">退出登录</a></li>
+                            </ul>
+                            <div class="modal fade" id='changePasswordModal' tabindex="-1" role="dialog"
+                                 aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title">修改密码</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="password_edit">
+                                                {% csrf_token %}
+                                                <div class="text-center">
+                                                    <label for="username">用户名</label>
+                                                    <p><input type="text" disabled value="{{ request.user.username }}"
+                                                              class="form-control" style="text-align: center;"
+                                                              id="username" name="username"></p>
+                                                </div>
+                                                <div class="text-center">
+                                                    <label for="old_password">旧密码</label>
+                                                    <p><input type="text" class="form-control"
+                                                              style="text-align: center;"
+                                                              id="old_password" name="old_password"></p>
+                                                </div>
+                                                <div class="text-center">
+                                                    <label for="new_password">新密码</label>
+                                                    <p><input type="text" class="form-control"
+                                                              style="text-align: center;"
+                                                              id="new_password" name="new_password"></p>
+                                                </div>
+                                                <div class="text-center">
+                                                    <label for="confirm_password">确认密码</label>
+                                                    <p><input type="text" class="form-control"
+                                                              style="text-align: center;"
+                                                              id="confirm_password" name="confirm_password"></p>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">取消
+                                            </button>
+                                            <button type="button" class="btn btn-primary" id="password_edit1">确定
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li><a href="{% url 'register' %}">注册</a></li>
+                        <li><a href="{% url 'login' %}">登录</a></li>
+                    {% endif %}
+                </ul>
+            </form>
+        </div>
+    </div>
+</nav>
+{% block fluid %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2">
+                {% for foo in cebian_gg %}
+                    <div class="thumbnail">
+                        <img src="/media/{{ foo.img }}/" alt="">
+                        <div class="caption">
+                            <h3>{{ foo.title }}</h3>
+                            <p>{{ foo.content }}</p>
+                            <p><a href="https://www.baidu.com/s?tn=25017023_2_dg&ch=5&word=%E4%BC%A0%E5%A5%87"
+                                  class="btn btn-primary" role="button">马上去玩</a>
+                                <a href="#" class="btn btn-default close_adv" role="button">关闭广告</a>
+                            </p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="col-md-8">
+                {% block guanggao %}
+                    {% for article_obj in page_queryset %}
+                        <div class="media">
+                            <h4 class="media-heading"><a
+                                    href="{% url 'article_detail' article_obj.blog.userinfo.username article_obj.pk %}">{{ article_obj.title }}</a>
+                            </h4>
+                            <div class="media-left">
+                                <a href="#">
+                                    <img class="media-object" data-src="holder.js/64x64" alt="64x64"
+                                         src="/media/{{ article_obj.blog.userinfo.avatar }}/"
+                                         data-holder-rendered="true" style="width: 64px; height: 64px;">
+                                </a>
+                            </div>
+                            <div class="media-body">
+                                {{ article_obj.desc }}
+                            </div>
+
+                        </div>
+                        <div class="media-bottom">
+                            <br>
+                            <a href="/{{ article_obj.blog.userinfo.username }}/">{{ article_obj.blog.userinfo.username }}</a>
+                            <span style="margin-left: 10px">{{ article_obj.create_time }}</span>
+                            <span class="glyphicon glyphicon-thumbs-up"
+                                  style="margin-left: 10px">{{ article_obj.up_num }}</span>
+                            <span class="glyphicon glyphicon-thumbs-down"
+                                  style="margin-left: 10px">{{ article_obj.up_down }}</span>
+                            <span class="glyphicon glyphicon-comment"
+                                  style="margin-left: 10px">{{ article_obj.comment_num }}</span>
+                        </div>
+                        <br>
+                    {% endfor %}
+                {% endblock %}
+                <div class="text-center">
+                    {{ page_obj.page_html|safe }}
+                </div>
+            </div>
+            <div class="col-md-2">
+                {% for foo in cebian_gg %}
+                    <div class="thumbnail">
+                        <img src="/media/{{ foo.img }}/" alt="">
+                        <div class="caption">
+                            <h3>{{ foo.title }}</h3>
+                            <p>{{ foo.content }}</p>
+                            <p><a href="https://www.baidu.com/s?tn=25017023_2_dg&ch=5&word=%E4%BC%A0%E5%A5%87"
+                                  class="btn btn-primary" role="button">马上去玩</a>
+                                <a href="#" class="btn btn-default close_adv" role="button">关闭广告</a>
+                            </p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+</body>
+<script>
+    $(document).ready(function () {
+        // 监听点击事件
+        $('#ajax-link').click(function (e) {
+            e.preventDefault();  // 阻止默认的导航行为
+            let data = {};
+            $.each($('#login_form').serializeArray(), function (index, dataDict) {
+                data[dataDict.name] = dataDict.value;
+            });
+            swal({
+                title: "确定要退出登录吗？",
+                icon: "warning",
+                buttons: ['取消', '确定'],
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            url: '/user/logout/',  // 修改为退出登录的 URL
+                            type: 'POST',     // 使用 POST 请求
+                            data: data,
+                            success: function (data) {
+                                swal("用户已退出!", {
+                                    icon: "success",
+                                }).then(() => {
+                                    // 退出成功后刷新页面
+                                    location.reload();
+                                });
+                            }
+                        });
+                    }
+                });
+        });
+    });
+</script>
+<script>
+    $('#password_edit1').click(function () {
+        let data = {};
+        $.each($('#login_form').serializeArray(), function (index, dataDict) {
+            data[dataDict.name] = dataDict.value;
+        });
+        $.ajax({
+            url: '/blog/change_password/',
+            type: 'post',
+            data: data,
+            success: function (response) {
+                if (response.code == 1000) {
+                    swal({
+                        title: response.msg,
+                        icon: "success",
+                        button: true,
+                    }).then(() => {
+                        window.location.href = response.url;
+                    });
+                } else {
+                    swal({
+                        title: response.msg,
+                        icon: "error",
+                        button: true,
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                }
+            }
+        })
+    })
+</script>
+<script>
+    $(document).ready(
+        $('#baidu_btn').click(function (event) {
+            function search() {
+                let keyword = $('#search_key').val();
+                let newurl = 'https://www.baidu.com/s?wd=' + keyword;
+                window.open(newurl, '_blank')
+            }
+
+            event.preventDefault();
+            search();
+
+        }),
+    )
+</script>
+
+
+<script>
+    $('.close_adv').click(function () {
+        $(this).closest('.thumbnail').hide();
+    })
+</script>
+<script>
+    $('#myfile1').change(function () {
+        // 创建文件阅读器对象
+        let myFileReader = new FileReader();
+        // 获取用户上传的头像文件
+        let fileobj = $(this)[0].files[0];
+        // 将文件对象交给阅读器读取
+        myFileReader.readAsDataURL(fileobj); // 异步操作 IO操作
+        // 当文件阅读器读取完毕后，将读取到的文件内容赋值给img标签
+        myFileReader.onload = function () {
+            $('#myfile1').attr('src', myFileReader.result);
+        }
+    })
+
+    $('#submit_avatar').click(function () {
+        let formData = new FormData();
+        formData.append('avatar', $('#myfile1')[0].files[0]);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}'); // 将 CSRF 令牌添加到表单数据
+        $.ajax({
+            url: '', // 设置上传文件的URL，你需要将其替换为实际的服务器端处理URL
+            type: 'post', // 使用 POST 方法上传文件
+            data: formData, // 使用 FormData 对象传递文件数据
+            contentType: false, // 不设置 contentType，让浏览器自动识别
+            processData: false, // 不对数据进行序列化处理
+            success: function (response) {
+                if (response.code === 200) {
+                    swal({
+                        title: response.msg,
+                        icon: "success",
+                        button: true,
+                    }).then(() => {
+                        window.location.reload()
+                    });
+                }
+            }
+        })
+    })
+</script>
+
+</html>

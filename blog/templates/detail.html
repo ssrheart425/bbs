@@ -1,0 +1,316 @@
+{% extends 'index.html' %}
+{% block guanggao %}
+    {% load static %}
+    <div class="layui-carousel" id="ID-carousel-demo-image">
+        <div carousel-item>
+            {% for data in adv_data %}
+                {% if data.is_background_img %}
+                    <div><img src="/media/{{ data.img }}/" style="height: 360px;width: 100%"></div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title text-center">广告中心
+            </h3>
+        </div>
+        <input type="submit" class="btn btn-danger" value="添加广告" id="gg_model" data-toggle="modal"
+               data-target="#myModal">
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title text-center" id="myModalLabel">添加广告信息</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form action="" id="myform">
+                            {% csrf_token %}
+                            <div class="text-center">
+                                <label for="title">广告标题</label>
+                                <p><input type="text" class="form-control text-center" id="title" name="title"></p>
+                            </div>
+                            <div class="text-center">
+                                <label for="content">广告内容</label>
+                                <p><input type="text" class="form-control text-center" id="content" name="content"></p>
+                            </div>
+                            <div class="text-center">
+                                <label for="phone">手机号</label>
+                                <p><input type="text" class="form-control text-center" id="phone" name="phone"></p>
+                            </div>
+                            <br>
+                            <div class="text-center">
+                                <label for="myfile">图片<img src="{% static 'img/kaixin.png' %}" alt="img_check"
+                                                             style="height: 80px;width: 80px" id="myimg">
+                                </label>
+                                <p><input type="file" id="myfile" name="img" style="display: None"></p>
+                            </div>
+                            <div class="text-center">
+                                <label for="lunbo">是否轮播图</label>
+                                <input type="radio" name="lunbo" value="1">是
+                                <input type="radio" name="lunbo" value="0" checked>否
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" id="adv_edit">提交</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>标题</th>
+                    <th>内容</th>
+                    <th>创建时间</th>
+                    <th>更新时间</th>
+                    <th>手机号</th>
+                    <th>广告图片</th>
+                    <th>轮播图</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for adv in page_queryset %}
+                    <tr class="active">
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ adv.title }}</td>
+                        <td>{{ adv.content }}</td>
+                        <td>{{ adv.create_time }}</td>
+                        <td>{{ adv.update_time }}</td>
+                        <td>{{ adv.mobile }}</td>
+                        <td><img src="/media/{{ adv.img }}/" alt="" style="width: auto; height: 80px"></td>
+                        <td>{{ adv.is_background_img }}</td>
+                        <td>
+                            <input type="hidden" name="adv_id" value="{{ adv.pk }}">
+                            <button class="btn btn-xs btn-success" value="author_edit" name="adv_edit1"
+                                    data-toggle="modal" data-target="#myModal{{ adv.pk }}">编辑
+                            </button>
+                            <!-- Modal -->
+                            <div class="modal fade" id="myModal{{ adv.pk }}" tabindex="-1" role="dialog"
+                                 aria-labelledby="myModalLabel">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title text-center" id="myModalLabel">编辑广告</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="" id="edit_form_{{ adv.pk }}">
+                                                {% csrf_token %}
+                                                <div class="text-center">
+                                                    <label for="title">广告标题</label>
+                                                    <p><input type="text" class="form-control text-center" id="advtitle"
+                                                              name="advtitle" value="{{ adv.title }}"></p>
+                                                </div>
+                                                <div class="text-center">
+                                                    <label for="content">广告内容</label>
+                                                    <p><input type="text" class="form-control text-center"
+                                                              id="advcontent"
+                                                              name="advcontent" value="{{ adv.content }}"></p>
+                                                </div>
+                                                <div class="text-center">
+                                                    <label for="phone">手机号</label>
+                                                    <p><input type="text" class="form-control text-center" id="advphone"
+                                                              name="advphone" value="{{ adv.mobile }}"></p>
+                                                </div>
+                                                <br>
+                                                <div class="text-center">
+                                                    <label for="advimg_44">图片<img src="/media/{{ adv.img }}/"
+                                                                                    style="height: 80px;width: 80px"
+                                                                                    id="advmyimg"
+                                                                                    class="img-circle advmyimg">
+                                                    </label>
+                                                    <p><input type="file" id="advimg_44" name="img" class="advimg_44"
+                                                              style="display: None">
+                                                    </p>
+                                                </div>
+                                                <div class="text-center">
+                                                    <label for="advlunbo">是否轮播图</label>
+                                                    <input type="radio" name="advlunbo" value="1">是
+                                                    <input type="radio" name="advlunbo" value="0" checked>否
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                                                        关闭
+                                                    </button>
+                                                    <button type="button" class="btn btn-primary btn_bianjibtn"
+                                                            id="bianjibtn" value="{{ adv.pk }}" name="btnpk">确定
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <form action="">
+                                {% csrf_token %}
+                                <button class="btn btn-xs btn-danger delete44" value="{{ adv.pk }}"
+                                        name="delete">删除
+                                </button>
+                            </form>
+                        </td>
+                        {#  删除#}
+                        <script>
+                            $(".delete44").click(function (event) {
+                                let id = $(this).val();
+                                event.preventDefault();
+                                swal({
+                                    title: "确定要删除吗？",
+                                    icon: "warning",
+                                    buttons: ['取消', '确定'],
+                                    dangerMode: true,
+                                })
+                                    .then((willDelete) => {
+                                        if (willDelete) {
+                                            $.ajax({
+                                                url: "",
+                                                method: "POST",
+                                                data: {
+                                                    'delete': id,
+                                                    'action': 'del',
+                                                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                                },
+                                                success: function (data) {
+                                                    swal("该条数据已删除!", {
+                                                        icon: "success",
+                                                    }).then(() => {
+                                                        location.reload(); // 删除成功后刷新页面
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+                            })
+                        </script>
+                        <script>
+                            $('.advimg_44').change(function () {
+                                let imgdata = new FileReader()
+                                let imgobj = $(this)[0].files[0];
+                                imgdata.readAsDataURL(imgobj);
+                                imgdata.onload = function () {
+                                    $('.advmyimg').attr('src', imgdata.result)
+                                }
+                            })
+                        </script>
+                        <script>
+                            $('.btn_bianjibtn').click(function () {
+                                let form_id = '#edit_form_' + $(this).attr('value')
+                                let editData = new FormData();
+                                $.each($(form_id).serializeArray(), function (index, obj) {
+                                    editData.append(obj.name, obj.value);
+                                })
+                                editData.append('advedit_img', $('#advimg_44')[0].files[0]);
+                                editData.append('adv_id', $(this).attr('value'));
+                                $.ajax({
+                                    url: '{% url 'edit_adv' %}',
+                                    type: 'post',
+                                    data: editData,
+                                    processData: false,
+                                    contentType: false,
+                                    success: function (args) {
+                                        if (args.code === 2000) {
+                                            swal({
+                                                title: args.msg,
+                                                icon: "success",
+                                                button: true,
+                                            }).then(() => {
+                                                window.location.reload();
+                                            });
+                                        } else {
+                                            swal({
+                                                title: args.msg,
+                                                icon: "error",
+                                                button: true,
+                                            }).then(() => {
+                                                window.location.reload();
+                                            });
+                                        }
+                                    }
+                                })
+                            })
+                        </script>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+    <script>
+        $('#myfile').change(function () {
+            // 文件阅读器对象
+            // 1 先生成一个文件阅读器对象
+            let myFileReader = new FileReader();
+            // 2 获取用户上传的头像文件
+            let fileobj = $(this)[0].files[0];
+            // 3 将文件对象交给阅读器读取
+            myFileReader.readAsDataURL(fileobj); // 异步操作 IO操作
+            // 4 当文件阅读器读取完毕后，将读取到的文件内容赋值给img标签
+            myFileReader.onload = function () {
+                $('#myimg').attr('src', myFileReader.result);
+            }
+        })
+    </script>
+    <script>
+        $('#adv_edit').click(function () {
+            let formData = new FormData();
+            $.each($('#myform').serializeArray(), function (index, obj) {
+                formData.append(obj.name, obj.value);
+            })
+            formData.append('adv_img', $('#myfile')[0].files[0]);
+            $.ajax({
+                url: '',
+                type: 'post',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (args) {
+                    if (args.code === 2000) {
+                        swal({
+                            title: args.msg,
+                            icon: "success",
+                            button: true,
+                        }).then(() => {
+                            window.location.href = args.url;
+                        });
+                    } else {
+                        swal({
+                            title: args.msg,
+                            icon: "error",
+                            button: true,
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                }
+            })
+        })
+    </script>
+    <script>
+        $(document).ready(function () {
+            layui.use(['carousel'], function () {
+                var carousel = layui.carousel;
+                // 渲染 - 图片轮播
+                carousel.render({
+                    elem: '#ID-carousel-demo-image',
+                    width: 'auto',
+                    height: '360px',
+                    interval: 3000
+                });
+            });
+        });
+    </script>
+{% endblock %}
