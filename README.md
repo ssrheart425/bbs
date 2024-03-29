@@ -497,7 +497,8 @@ class MyRegForm(forms.Form):
 </html>
 ```
 
-![image-20240315145616526](D:\2023python+go全栈笔记\Python基础\BBS\BBS.assets\image-20240315145616526.png)
+![image-20240315145616526](https://github.com/ssrheart425/bbs/assets/111131332/aed179fb-c977-4581-ae1a-1be515c93cac)
+
 
 > 提供的代码实现了Django中的用户注册功能，包括表单验证、客户端交互和服务器端处理。
 >
@@ -554,8 +555,6 @@ def get_code(request):
     return HttpResponse(data)  # 返回一个图片
 ```
 
-![image-20240315145601738](D:\2023python+go全栈笔记\Python基础\BBS\BBS.assets\image-20240315145601738.png)
-
 - 验证码推导二
 - 文件存储繁琐 IO操作效率低
 - 需要用到相关模块 `Pillow`
@@ -587,7 +586,8 @@ def get_code(request):
     return HttpResponse(data)  # 返回一个图片
 ```
 
-![image-20240315151124680](D:\2023python+go全栈笔记\Python基础\BBS\BBS.assets\image-20240315151124680.png)
+![image-20240315151124680](https://github.com/ssrheart425/bbs/assets/111131332/629ada39-1162-454f-b1fd-daef62b88ca5)
+
 
 - 验证码推导三
 - 需要用到相关模块 `io`
@@ -661,7 +661,8 @@ def get_code(request):
 </script>
 ```
 
-![image-20240315154104125](D:\2023python+go全栈笔记\Python基础\BBS\BBS.assets\image-20240315154104125.png)
+![image-20240315154104125](https://github.com/ssrheart425/bbs/assets/111131332/8d9ccb8f-1d4d-4421-bbad-f51ba7457e61)
+
 
 ### (2)登录功能
 
@@ -1083,7 +1084,8 @@ def index(request):
 </script>
 ```
 
-![image-20240329092142778](D:\2023python+go全栈笔记\Python基础\BBS\BBS.assets\image-20240329092142778.png)
+![image-20240329092142778](https://github.com/ssrheart425/bbs/assets/111131332/34dfe748-373f-4329-aa55-a2fdfcd9ec08)
+
 
 # blog 首页
 
@@ -1120,7 +1122,8 @@ urlpatterns = [
 </script>
 ```
 
-![image-20240319193744483](D:\2023python+go全栈笔记\Python基础\BBS\BBS.assets\image-20240319193744483.png)
+![image-20240319193744483](https://github.com/ssrheart425/bbs/assets/111131332/986561ee-60c9-422c-913b-1ea9439b2664)
+
 
 ## 广告中心(添加、编辑、删除)
 
@@ -1224,9 +1227,11 @@ def adv(request):
 </div>
 ```
 
-![image-20240319193825187](D:\2023python+go全栈笔记\Python基础\BBS\BBS.assets\image-20240319193825187.png)
+![image-20240319193825187](https://github.com/ssrheart425/bbs/assets/111131332/05b84173-ca31-41de-b650-d274279701f3)
 
-![image-20240319193836038](D:\2023python+go全栈笔记\Python基础\BBS\BBS.assets\image-20240319193836038.png)
+
+![image-20240319193836038](https://github.com/ssrheart425/bbs/assets/111131332/e61b4431-c0b9-468d-a7e9-0663fa7cccc5)
+
 
 - 编辑广告
 
@@ -1263,7 +1268,8 @@ def edit_adv(request):
     return JsonResponse(back_dic)
 ```
 
-![image-20240319193813692](D:\2023python+go全栈笔记\Python基础\BBS\BBS.assets\image-20240319193813692.png)
+![image-20240319193813692](https://github.com/ssrheart425/bbs/assets/111131332/68e12a1c-0b16-43c2-bf0a-9d3459eef266)
+
 
 - html
 
@@ -1574,7 +1580,8 @@ def edit_adv(request):
 {% endblock %}
 ```
 
-![image-20240319193752814](D:\2023python+go全栈笔记\Python基础\BBS\BBS.assets\image-20240319193752814.png)
+![image-20240319193752814](https://github.com/ssrheart425/bbs/assets/111131332/9fc37b35-8f8d-47dd-9de7-a656ccb76c7f)
+
 
 ## 轮播图
 
@@ -1756,7 +1763,8 @@ def site(request, username, **kwargs):
 {% endblock %}
 ```
 
-![image-20240329093949428](D:\2023python+go全栈笔记\Python基础\BBS\BBS.assets\image-20240329093949428.png)
+![image-20240329093949428](https://github.com/ssrheart425/bbs/assets/111131332/38180e6a-35bb-410c-97ea-20b65cab56f9)
+
 
 ## 详情页搭建
 
