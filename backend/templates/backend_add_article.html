@@ -1,0 +1,111 @@
+{% extends 'backend.html' %}
+{% block backend_right %}
+    {% load static %}
+    <script charset="utf-8" src="{% static 'Editor/kindeditor/kindeditor-all-min.js' %}"></script>
+    <script charset="utf-8" src="{% static 'Editor/kindeditor/lang/zh-CN.js' %}"></script>
+    <div class="col-md-10">
+        <ul id="myTabs" class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="{% url 'backend_add_article' %}" id="add_article" role="tab"
+                                                      data-toggle="tab"
+                                                      aria-controls="profile" aria-expanded="true">添加文章</a></li>
+            <li role="presentation" class=""><a href="{% url 'backend' %}" id="home-tab" role="tab"
+                                                data-toggle="tab"
+                                                aria-controls="profile" aria-expanded="false">随笔</a></li>
+            <li role="presentation" class=""><a href="{% url 'backend_category' %}" role="tab" id="profile-tab"
+                                                data-toggle="tab"
+                                                aria-controls="categories" aria-expanded="false">分类</a></li>
+            <li role="presentation" class=""><a href="{% url 'backend_tag' %}" role="tab" id="profile-tab"
+                                                data-toggle="tab"
+                                                aria-controls="tags" aria-expanded="false">标签</a></li>
+            <li role="presentation" class=""><a href="{% url 'backend_comment' %}" role="tab" id="profile-tab"
+                                                data-toggle="tab"
+                                                aria-controls="comments" aria-expanded="false">评论</a></li>
+        </ul>
+        <br>
+        <form id="form_tijiao">
+            {% csrf_token %}
+            <div class="alert alert-info" role="alert">添加文章</div>
+            <div class="form-group">
+                <label for="biaoti">标题</label>
+                <input type="text" class="form-control" id="biaoti" name="biaoti">
+            </div>
+            <br>
+            <div class="form-group">
+                <label for="article_content">文章内容</label>
+                <textarea name="neirong" id="article_content" cols="30" rows="10" class="form-control"
+                          required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="desc">文章简介</label>
+                <input type="text" class="form-control" id="desc" name="desc">
+            </div>
+            <div class="form-group">
+                <label for="fenlei">文章分类</label>
+                <select name="fenlei" id="fenlei" class="form-control">
+                    <option value="" disabled selected>选择分类</option>
+                    {% for article_obj in article_category %}
+                        <option value="{{ article_obj.name }}">{{ article_obj.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>文章标签</label><br>
+                {% for tag_obj in article_tag %}
+                    <input type="checkbox" value="{{ tag_obj.pk }}" name="tag" id="tag">{{ tag_obj.name }}
+                {% endfor %}
+            </div>
+            <button class="btn btn-primary form-control" id="tijiao">提交</button>
+        </form>
+    </div>
+
+    <script>
+        $('#tijiao').click(function () {
+            let data = {};
+            data['biaoti'] = $('#biaoti').val();
+            data['fenlei'] = $('#fenlei').val();
+            data['desc'] = $('#desc').val();
+            let selectedTags = [];
+            $('input[name="tag"]:checked').each(function () {
+                selectedTags.push($(this).val());
+            });
+            data['tag'] = selectedTags;
+            data['neirong'] = window.editor.html();
+            data['csrfmiddlewaretoken'] = '{{ csrf_token }}';
+            console.log(data);
+            $.ajax({
+                url: '{% url 'backend_add_article' %}',
+                type: 'post',
+                data: data,
+                success: function (args) {
+                    if (args.code === 2000) {
+                        swal({
+                            title: args.msg,
+                            icon: "success",
+                            button: true,
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        swal({
+                            title: args.msg,
+                            icon: "error",
+                            button: true,
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+    <script>
+        KindEditor.ready(function (K) {
+            window.editor = K.create('#article_content', {
+                "width": "100%",
+                "height": "400px",
+                "resizeType": 1,
+            });
+        });
+    </script>
+{% endblock %}

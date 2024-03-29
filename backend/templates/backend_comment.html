@@ -1,0 +1,49 @@
+{% extends 'backend.html' %}
+{% block backend_right %}
+    <div class="col-md-10">
+        <ul id="myTabs" class="nav nav-tabs" role="tablist">
+            <li role="presentation" class=""><a href="{% url 'backend_add_article' %}" id="add_article" role="tab"
+                                                      data-toggle="tab"
+                                                      aria-controls="profile" aria-expanded="false">添加文章</a>
+            </li>
+            <li role="presentation" class=""><a href="{% url 'backend' %}" id="home-tab" role="tab"
+                                                data-toggle="tab"
+                                                aria-controls="profile" aria-expanded="false">随笔</a></li>
+            <li role="presentation" class=""><a href="{% url 'backend_category' %}" role="tab" id="profile-tab"
+                                                data-toggle="tab"
+                                                aria-controls="categories" aria-expanded="false">分类</a></li>
+            <li role="presentation" class=""><a href="{% url 'backend_tag' %}" role="tab" id="profile-tab"
+                                                data-toggle="tab"
+                                                aria-controls="tags" aria-expanded="false">标签</a></li>
+            <li role="presentation" class="active"><a href="{% url 'backend_comment' %}" role="tab" id="profile-tab"
+                                                      data-toggle="tab"
+                                                      aria-controls="comments" aria-expanded="true">评论</a></li>
+        </ul>
+        <br>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>文章名称</th>
+                <th>评论内容</th>
+                <th>评论时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                {% for comment_data in page_queryset %}
+                    <td>{{ comment_data.article__title }}</td>
+                    <td>{{ comment_data.content }}</td>
+                    <td>{{ comment_data.comment_time }}</td>
+                    <td>
+                        <button class="btn btn-primary btn-xs edit">编辑</button>
+                        <button class="btn btn-danger btn-xs delete">删除</button>
+                    </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="text-center">{{ page_obj.page_html|safe }}
+    </div>
+{% endblock %}

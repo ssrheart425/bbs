@@ -1,0 +1,310 @@
+<!-- -*- coding: utf-8 -*- -->
+<!-- author : heart -->
+<!-- blog_url : https://www.cnblogs.com/ssrheart/ -->
+<!-- time : 2024/3/27 -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/sweetalert.min.js' %}"></script>
+    <link href="//unpkg.com/layui@2.9.7/dist/css/layui.css" rel="stylesheet">
+    <script src="//unpkg.com/layui@2.9.7/dist/layui.js"></script>
+</head>
+<body>
+{#导航栏#}
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'index' %}">首页</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">新闻 <span class="sr-only">(current)</span></a></li>
+                <li><a href="#">动态</a></li>
+                <li><a href="#">博问</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                {% if request.user.is_authenticated %}
+                    <li><a href="#">{{ request.user }}</a></li>
+                    <li><a href="{% url 'backendlogout' %}">退出登录</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}">登录</a></li>
+                {% endif %}
+
+
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-offset-1">
+            <div class="col-md-8">
+                <a href="{% url 'index' %}"><img src="media/advImg/logo.png" alt=""
+                                                 style="width: auto;height: 50px"></a>
+            </div>
+        </div>
+        <div class="col-md-1 pull-right">
+            <h2><a href="{% url 'site' request.user %}" style="color: blue">{{ request.user }}</a></h2>
+        </div>
+    </div>
+    <br><br><br><br>
+    <div class="row">
+        <div class="col-md-2">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title text-center">随笔管理</h3>
+                </div>
+                <div class="panel-body">
+                    <p><a href="{% url 'backend_add_article' %}" class="glyphicon glyphicon-plus-sign">新建随笔</a></p>
+                    <p><a href="" class="glyphicon glyphicon-folder-open">随笔模版</a></p>
+                    <p><a href="">草稿箱</a></p>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title text-center">分类管理</h3>
+                </div>
+                <div class="panel-body">
+                    <p><a href="" class="glyphicon glyphicon-plus-sign">新建分类</a></p>
+                    <p><a href="" class="glyphicon glyphicon-folder-open">分类模版</a></p>
+                    <hr>
+                    <h4 class="text-center" style="color: red">分类展示</h4>
+                    <br>
+                    {% for fenlei_obj in category_data %}
+                        <div>
+                            <p><a href="">{{ fenlei_obj.name }}({{ fenlei_obj.article_num }})</a></p>
+                            <br>
+                        </div>
+                    {% endfor %}
+                    <hr>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title text-center">标签管理</h3>
+                </div>
+                <div class="panel-body">
+                    <p><a href="" class="glyphicon glyphicon-plus-sign">新建标签</a></p>
+                    <p><a href="" class="glyphicon glyphicon-folder-open">标签模版</a></p>
+                    <hr>
+                    <h4 class="text-center" style="color: red">标签展示</h4>
+                    <br>
+                    {% for tag_obj in tag_data %}
+                        <div>
+                            {{ tag_obj.name }}({{ tag_obj.tag_num }})
+                        </div>
+                        <br>
+                    {% endfor %}
+                    <hr>
+                </div>
+            </div>
+        </div>
+        {% block backend_right %}
+            <div class="col-md-10">
+                <ul id="myTabs" class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class=""><a href="{% url 'backend_add_article' %}" id="add_article"
+                                                        role="tab"
+                                                        data-toggle="tab"
+                                                        aria-controls="profile" aria-expanded="false">添加文章</a>
+                    </li>
+                    <li role="presentation" class="active"><a href="{% url 'backend' %}" id="home-tab" role="tab"
+                                                              data-toggle="tab"
+                                                              aria-controls="home" aria-expanded="true">随笔</a></li>
+                    <li role="presentation" class=""><a href="{% url 'backend_category' %}" role="tab" id="profile-tab"
+                                                        data-toggle="tab"
+                                                        aria-controls="profile" aria-expanded="false">分类</a></li>
+                    <li role="presentation" class=""><a href="{% url 'backend_tag' %}" role="tab" id="profile-tab"
+                                                        data-toggle="tab"
+                                                        aria-controls="profile" aria-expanded="false">标签</a></li>
+                    <li role="presentation" class=""><a href="{% url 'backend_comment' %}" role="tab" id="profile-tab"
+                                                        data-toggle="tab"
+                                                        aria-controls="profile" aria-expanded="false">评论</a></li>
+                </ul>
+                <br>
+                <table class="table table-striped">
+                    {% csrf_token %}
+                    <thead>
+                    <tr>
+                        <th>标题</th>
+                        <th>发布时间</th>
+                        <th>点赞数</th>
+                        <th>点踩数</th>
+                        <th>评论数</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        {% for article_obj in page_queryset %}
+                            <td>
+                                <a href="{% url 'article_detail'  request.user article_obj.pk %}">{{ article_obj.title }}</a>
+                            </td>
+                            <td>{{ article_obj.create_time|date:'Y-m-d' }}</td>
+                            <td>{{ article_obj.up_num }}</td>
+                            <td>{{ article_obj.up_down }}</td>
+                            <td>{{ article_obj.comment_num }}</td>
+                            <td>
+                                <button class="btn btn-primary btn-xs edit" data-toggle="modal"
+                                        data-target="#myModal{{ article_obj.pk }}" value="{{ article_obj.pk }}"
+                                        id="edit_btn">编辑
+                                </button>
+                                <div class="modal fade myModal" tabindex="-1" role="dialog"
+                                     id="myModal{{ article_obj.pk }}">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Close"><span aria-hidden="true">&times;</span>
+                                                </button>
+                                                <h4 class="modal-title text-center">修改随笔信息</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="form-group">
+                                                    <p class="text-center"><label for="art_title">标题</label></p>
+                                                    <input type="text" value="{{ article_obj.title }}"
+                                                           class="form-control text-center" name="art_title"
+                                                           id="art_title">
+                                                </div>
+                                                <div class="form-group">
+                                                    <p class="text-center"><label>内容</label></p>
+                                                    <textarea class="form-control text-center" id="art_content"
+                                                              cols="30"
+                                                              rows="10"
+                                                              name="art_content">{{ article_obj.content }}</textarea>
+                                                </div>
+                                                <div class="form-group">
+                                                    <p class="text-center"><label for="art_desc">简介</label></p>
+                                                    <input type="text" value="{{ article_obj.desc }}"
+                                                           class="form-control text-center" name="art_desc"
+                                                           id="art_desc">
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <p class="text-center"><label for="cate_a">选择分类</label></p>
+                                                    <select name="cate_a" id="cate_a" class="form-control">
+                                                        <option value="" disabled="" selected="">选择分类</option>
+                                                        {% for cate_a in article_category %}
+                                                            <option value="{{ cate_a.pk }}">{{ cate_a.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <p class="text-center"><label for="tag_a">选择标签</label></p>
+                                                    <select name="tag_a" id="tag_a" class="form-control"
+                                                            multiple>
+                                                        <option value="" disabled="" selected="">选择标签</option>
+                                                        {% for tag_a in article_tag %}
+                                                            <option value="{{ tag_a.pk }}">{{ tag_a.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">
+                                                    关闭
+                                                </button>
+                                                <button type="button" class="btn btn-primary art_edit">提交
+                                                </button>
+                                            </div>
+                                        </div><!-- /.modal-content -->
+                                    </div><!-- /.modal-dialog -->
+                                </div><!-- /.modal -->
+                                <button class="btn btn-danger btn-xs delete" value="{{ article_obj.pk }}">删除</button>
+                            </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-center">{{ page_obj.page_html|safe }}</div>
+        {% endblock %}
+    </div>
+    <script>
+        // 使用jQuery捕获点击事件并执行页面重定向
+        $(document).ready(function () {
+            $('ul.nav-tabs a').click(function (e) {
+                e.preventDefault(); // 阻止默认的链接跳转行为
+                var url = $(this).attr('href'); // 获取被点击链接的URL
+                window.location.href = url; // 执行页面跳转
+            });
+        });
+    </script>
+    <script>
+        $('.delete').click(function () {
+            let pk = $(this).attr('value');
+            swal({
+                title: "确定要删除吗？",
+                icon: "warning",
+                buttons: ['取消', '确定'],
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        url: '{% url 'backend' %}',
+                        type: 'post',
+                        data: {
+                            'pk': pk,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}',
+                            'tag': 'delete'
+                        },
+                        success: function (data) {
+                            swal(data.msg, {
+                                icon: "success",
+                            }).then(() => {
+                                location.reload(); // 删除成功后刷新页面
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+    <script>
+        $('.art_edit').click(function () {
+            let data = {}
+            data['art_pk'] = $('#edit_btn').val();
+            data['art_title'] = $('#art_title').val();
+            data['art_content'] = $('#art_content').val();
+            data['art_desc'] = $('#art_desc').val();
+            data['art_tag'] = 'edit';
+            data['cate_a'] = $('#cate_a').val();
+            data['tag_a'] = $('#tag_a').val();
+            data['csrfmiddlewaretoken'] = '{{ csrf_token }}';
+            $.ajax({
+                url: '{% url 'backend' %}',
+                type: 'post',
+                data: data,
+                success: function (args) {
+                    if (args.code === 2000) {
+                        swal({
+                            title: args.msg,
+                            icon: "success",
+                            button: true,
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                }
+            })
+        });
+    </script>
+</div>
+</body>
+</html>
