@@ -1,0 +1,193 @@
+{% extends 'site.html' %}
+{% load static %}
+{% block detail %}
+    <style>
+        #div_digg {
+            float: right;
+            margin-bottom: 10px;
+            margin-right: 30px;
+            font-size: 12px;
+            width: 128px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .diggit {
+            float: left;
+            width: 46px;
+            height: 52px;
+            background: url({% static 'img/upup.gif' %}) no-repeat;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 2px;
+            padding-top: 5px;
+        }
+
+        .buryit {
+            float: right;
+            margin-left: 20px;
+            width: 46px;
+            height: 52px;
+            background: url({% static 'img/downdown.gif' %}) no-repeat;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 2px;
+            padding-top: 5px;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+
+        .diggword {
+            margin-top: 5px;
+            margin-left: 0;
+            font-size: 12px;
+            color: #808080;
+        }
+    </style>
+    <div class="media">
+        {% csrf_token %}
+        <div class="pull-right">
+            <span>随笔 - {{ all_count }} 点赞数 - {{ detail_art.up_num }} 点踩数 - {{ detail_art.up_down }} 评论数 - {{ detail_art.comment_num }}</span>
+        </div>
+        <br>
+        <div class="media-heading">
+            <a href=""><h2>{{ detail_art }}</h2></a>
+            <hr>
+        </div>
+        <div class="media-body">
+            <p>{{ detail_art.content|safe }}</p>
+        </div>
+        {#点赞#}
+        <div class="clearfix">
+            <div class="pull-right">
+                <div class="media-bottom">
+                    <div id="div_digg">
+                        <div class="diggit" onclick="votePost({{ detail_art.pk }},'Digg')">
+                            <span class="diggnum" id="digg_count">{{ detail_art.up_num }}</span>
+                        </div>
+                        <div class="buryit" onclick="votePost({{ detail_art.pk }},'Bury')">
+                            <span class="burynum" id="bury_count">{{ detail_art.up_down }}</span>
+                        </div>
+                        <div class="clear"></div>
+                        <div class="diggword" id="digg_tips">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        posted @ {{ detail_art.create_time|date:'Y-m-d' }}
+        <a href="{% url 'site' article_obj1.blog.site_name %}">{{ article_obj1.blog.site_name }}</a>
+        评论({{ detail_art.comment_num }})
+        <br>
+        <hr>
+        {% if request.user.is_authenticated %}
+            <h3>评论列表</h3>
+            <hr>
+            {% for comment in comment_obj %}
+                {% if not comment.parent %}
+                    <div>
+                        <p>#{{ forloop.counter }}楼 {{ comment.comment_time|date:'Y-m-d H:i:s' }} @<a
+                                href="{% url 'site' comment.user.username %}">{{ comment.user.username }}</a>
+                            <a href="#comment_area" style="color: red" class="pull-right comment_replay"
+                               replay_username='{{ comment.user.username }}' parent_id= {{ comment.pk }}>回复</a>&nbsp;&nbsp;&nbsp;
+                        </p>
+                        <p>{{ comment.content }}</p>
+                        {% for comment1 in comment_obj %}
+                            {% if comment1.parent.pk  == comment.pk %}
+                                @  <a href="{% url 'site' comment.user.username %}">{{ comment1.parent.user.username }} </a><p>{{ comment1.content }}</p>
+                            {% endif %}
+
+                        {% endfor %}
+                        <hr>
+                        <br>
+                    </div>
+                {% endif %}
+
+            {% endfor %}
+            <h3>发表评论</h3>
+            <textarea name="" id="comment_area" cols="30" rows="10" class="form-control"></textarea>
+            <br>
+            <button class="btn btn-primary" id="submit_comment">提交评论</button>
+        {% else %}
+            <p>登录后才能查看或发表评论，立即<a href="{% url 'login' %}" style="color: red">登录</a></p>
+        {% endif %}
+    </div>
+
+
+
+    <script>
+        function votePost(id, tag) {
+            let tipes = $('#digg_tips');
+            let data = {
+                'id': id,
+                // 三元表达式
+                'up_down': 1 ? tag === 'Digg' : 0,
+                'csrfmiddlewaretoken': "{{ csrf_token }}",
+            }
+            $.ajax({
+                url: '{% url 'up_down' %}',
+                type: 'post',
+                data: data,
+                success: function (args) {
+                    if (args.code === 1000) {
+                        tipes.text(args.msg)
+                        if (args.msg === '点赞成功!') {
+                            $('#digg_count').text(parseInt($('#digg_count').text()) + 1)
+                        } else {
+                            $('#bury_count').text(parseInt($('#bury_count').text()) + 1)
+                        }
+                    } else {
+                        tipes.text(args.msg)
+                    }
+                }
+            })
+        }
+    </script>
+    <script>
+        let parentID = null;
+        $('#submit_comment').click(function () {
+            let content = $('#comment_area').val()
+            if (parentID) {
+                let clearNum = content.indexOf("\n") + 1
+                content = content.slice(clearNum)
+            }
+            $.ajax({
+                url: '{% url 'comment' %}',
+                type: 'post',
+                data: {
+                    'content': content,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}",
+                    'parentID': parentID,
+                    'article_id': '{{ detail_art.pk }}'
+                },
+                success: function (args) {
+                    if (args.code === 1000) {
+                        swal({
+                            title: args.msg,
+                            icon: "success",
+                            button: true,
+                        }).then(() => {
+                            window.location.reload()
+                        });
+                    } else {
+                        swal({
+                            title: args.msg,
+                            icon: "error",
+                            button: true,
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                }
+            })
+        })
+        $('.comment_replay').click(function () {
+            let username = $(this).attr('replay_username')
+            $('#comment_area').text('@' + username + '\n')
+            parentID = $(this).attr('parent_id')
+        })
+    </script>
+{% endblock %}

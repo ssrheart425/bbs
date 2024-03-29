@@ -1,0 +1,101 @@
+{% extends 'index.html' %}
+
+{% block fluid %}
+    {% load static %}
+    <link rel="stylesheet" href="/static/css/{{ blog_data.site_theme }}">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="bs-example" data-example-id="contextual-panels">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">我的分类</h3>
+                        </div>
+                        {% for cat_obj in category_data %}
+                            <div class="panel-body">
+                                <a href="{% url 'article_left' username 'category' cat_obj.id %}">{{ cat_obj.name }}({{ cat_obj.article_num }})</a>
+                                <hr>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="panel panel-success">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">随笔标签</h3>
+                        </div>
+                        {% for tag_obj in Tag_data %}
+                            <div class="panel-body">
+                                <a href="{% url 'article_left' username 'tag' tag_obj.id %}">{{ tag_obj.name }}({{ tag_obj.tag_num }})</a>
+                                <hr>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">随笔档案</h3>
+                        </div>
+                        {% for time_obj in time_data %}
+                            <div class="panel-body">
+                                <a href="{% url 'article_left' username 'archive' time_obj.create_num|date:'Y-m' %}">{{ time_obj.create_num|date:'Y-m' }}({{ time_obj.article_num }})</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="panel panel-warning">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">点赞排行</h3>
+                        </div>
+                        {% for dianzan_obj in dianzan_data %}
+                            <div class="panel-body">
+                                <a href="">{{ dianzan_obj.title }}({{ dianzan_obj.up_num }})</a>
+                            </div>
+                        {% endfor %}
+
+
+                    </div>
+                </div>
+            </div>
+            {% block detail %}
+                <div class="col-md-10">
+                    {% for atc_data in page_queryset %}
+                        <div class="media">
+                            <h4 class="media-heading"><a
+                                    href="{% url 'article_detail' username atc_data.pk %}">{{ atc_data.title }}</a></h4>
+                            <div class="media-left">
+                                <a href="#">
+                                    <img class="media-object" data-src="holder.js/64x64" alt="64x64"
+                                         src="/media/{{ atc_data.blog.userinfo.avatar }}/"
+                                         data-holder-rendered="true" style="width: 64px; height: 64px;">
+                                </a>
+                            </div>
+                            <div class="media-body">
+                                摘要: &nbsp {{ atc_data.desc }}
+                            </div>
+
+                        </div>
+                        <div class="media-bottom pull-right">
+                            <br>
+                            <style>
+                                span {
+                                    color: grey
+                                }
+                            </style>
+                            <span style="margin-left: 10px">posted @ {{ atc_data.create_time }}</span>
+                            <span style="margin-left: 10px">{{ atc_data.blog.userinfo.username }}</span>
+                            <span class="glyphicon glyphicon-thumbs-up"
+                                  style="margin-left: 10px">{{ atc_data.up_num }}</span>
+                            <span class="glyphicon glyphicon-thumbs-down"
+                                  style="margin-left: 10px">{{ atc_data.up_down }}</span>
+                            <span class="glyphicon glyphicon-comment"
+                                  style="margin-left: 10px">{{ atc_data.comment_num }}</span>
+                        </div>
+                        <br>
+                        <hr>
+                    {% endfor %}
+                </div>
+            {% endblock %}
+            <div class="text-center">
+                {{ page_obj.page_html|safe }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
